@@ -27,24 +27,22 @@ void GEMMKernel(const float (&matrixArrayA)[][16][8], const float (&matrixArrayB
     auto& matrixB = matrixArrayB[matrixID];
     auto& matrixC = matrixArrayC[matrixID];
 
-    wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::col_major> a_frag;
+    wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> a_frag;
     wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::row_major> b_frag;
     wmma::fragment<wmma::accumulator, 16, 16, 8, float> c_frag;
 
    // Initialize the output to zero
-   wmma::fill_fragment(a_frag, 0.0f);
-   wmma::fill_fragment(b_frag, 0.0f);
    wmma::fill_fragment(c_frag, 0.0f);
 
    // Load the inputs
-   wmma::load_matrix_sync(a_frag, &matrixA[0][0], 16);
-   wmma::load_matrix_sync(b_frag, &matrixB[0][0], 8);
+   wmma::load_matrix_sync(a_frag, &matrixA[0][0], 8);
+   wmma::load_matrix_sync(b_frag, &matrixB[0][0], 16);
 
    // Perform the matrix multiplication
    wmma::mma_sync(c_frag, a_frag, b_frag, c_frag);
 
    // Store the output
-   wmma::store_matrix_sync(&matrixC[0][0], c_frag, 16, wmma::mem_col_major);
+   wmma::store_matrix_sync(&matrixC[0][0], c_frag, 16, wmma::mem_row_major);
 
     
 }
