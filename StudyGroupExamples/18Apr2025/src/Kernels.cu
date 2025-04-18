@@ -38,13 +38,11 @@ void computeLaplacianKernel(float *uRaw,float *LuRaw)
         int bi = (blockIdx.x << 3);
         int bj = (blockIdx.y << 3);
         int bk = (blockIdx.z << 3);
-        if (eID < 1000) {
-            int i = bi + ii - 1;
-            int j = bj + jj - 1;
-            int k = bk + kk - 1;
-            bool onBoundary = (i <= 0) || (i >= XDIM-1) || (j <= 0) || (j >= YDIM-1) || (k <= 0) || (k >= ZDIM-1);
-            uLocal[ii-1][jj-1][kk-1] = onBoundary ? u[i][j][k] : 0.;
-        }
+        int i = bi + ii - 1;
+        int j = bj + jj - 1;
+        int k = bk + kk - 1;
+        bool onBoundary = (i < 0) || (i > XDIM-1) || (j < 0) || (j > YDIM-1) || (k < 0) || (k > ZDIM-1);
+        uLocal[ii-1][jj-1][kk-1] = !onBoundary ? u[i][j][k] : 0.;
     }
 
     __syncthreads();
