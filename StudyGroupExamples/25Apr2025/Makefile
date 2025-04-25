@@ -7,7 +7,7 @@ CUDA_LIBS=-lcudart -lcuda
 
 ABI_FLAG =
 CFLAGS = -std=c++17 -Wall -w -mavx2 -mfma -fopenmp
-INCLUDES = -I./include -I$(CUDA_ROOT)/include
+INCLUDES = -I./include -I$(CUDA_ROOT)/include -I$(CUTLASS_ROOT)/include
 LIBRARY = $(CUDA_LIBRARY)
 LIBS = $(CUDA_LIBS)
 DEP = Makefile include/*.h

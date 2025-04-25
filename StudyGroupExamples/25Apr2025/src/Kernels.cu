@@ -9,7 +9,12 @@
 
 #include "Kernels.h"
 
+#include <cute/tensor.hpp>
+#include <cute/atom/mma_atom.hpp>
+#include <cute/atom/copy_atom.hpp>
+
 using namespace nvcuda;
+using namespace cute;
 
 bool check_cuda_result(cudaError_t code, const char* file, int line)
 {
@@ -18,6 +23,47 @@ bool check_cuda_result(cudaError_t code, const char* file, int line)
 
     fprintf(stderr, "CUDA error %u: %s (%s:%d)\n", unsigned(code), cudaGetErrorString(code), file, line);
     return false;
+}
+
+__global__
+void GEMMKernel_v5(const float (&matrixArrayA)[][SIZE_M][SIZE_K], const float (&matrixArrayB)[][SIZE_K][SIZE_N], float (&matrixArrayC)[][SIZE_M][SIZE_N])
+{
+    int matrixID = blockIdx.x;
+    int threadID = threadIdx.x;
+
+    using _M = _128;
+    using _N = _128;
+    using _K = _64;
+    using TiledMma = TiledMMA<
+        MMA_Atom<SM80_16x8x8_F32TF32TF32F32_TN>,
+        Layout<Shape<_2, _2, _1>>>;
+    
+    Tensor gA = make_tensor(make_gmem_ptr(&matrixArrayA[matrixID][0][0]),
+        make_layout(make_shape(_M{}, _K{}), GenRowMajor{}));
+    Tensor gB = make_tensor(make_gmem_ptr(&matrixArrayB[matrixID][0][0]),
+        make_layout(make_shape(_N{}, _K{}), GenColMajor{}));
+    Tensor gC = make_tensor(make_gmem_ptr(&matrixArrayC[matrixID][0][0]),
+        make_layout(make_shape(_M{}, _N{}), GenRowMajor{}));
+
+    TiledMma tiled_mma;
+    Tensor accum = partition_fragment_C(tiled_mma, Shape<_M, _N>{});
+
+    auto thr_mma = tiled_mma.get_thread_slice(threadID);
+
+    Tensor tCgA = thr_mma.partition_A(gA);
+    Tensor tCgB = thr_mma.partition_B(gB);
+    Tensor tCrA = thr_mma.partition_fragment_A(gA);
+    Tensor tCrB = thr_mma.partition_fragment_B(gB);
+
+    copy(tCgA, tCrA);
+    copy(tCgB, tCrB);
+
+    __syncthreads();
+
+    gemm(tiled_mma, accum, tCrA, tCrB, accum);
+
+    Tensor tCgC = thr_mma.partition_C(gC);
+    copy(accum, tCgC);
 }
 
 __global__
@@ -248,11 +294,12 @@ float computeGEMMtestGPU(const float (&matrixArrayA)[][SIZE_M][SIZE_K], const fl
      check_cuda(cudaEventRecord(start));
 
      check_cuda(cudaGetLastError());
-     GEMMKernelSerial<<<numMatrices, 1>>>(matrixArrayA,matrixArrayB,matrixArrayC);
+     // GEMMKernelSerial<<<numMatrices, 1>>>(matrixArrayA,matrixArrayB,matrixArrayC);
      // GEMMKernel_v1<<<numMatrices,32>>>(matrixArrayA,matrixArrayB,matrixArrayC);
      // GEMMKernel_v2<<<numMatrices,128>>>(matrixArrayA,matrixArrayB,matrixArrayC);
      // GEMMKernel_v3<<<numMatrices,32>>>(matrixArrayA,matrixArrayB,matrixArrayC);
      // GEMMKernel_v4<<<numMatrices,128>>>(matrixArrayA,matrixArrayB,matrixArrayC);
+     GEMMKernel_v5<<<numMatrices,128>>>(matrixArrayA,matrixArrayB,matrixArrayC);
      check_cuda(cudaGetLastError());
 
      check_cuda(cudaEventRecord(stop));
