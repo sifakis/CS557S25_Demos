@@ -1,0 +1,17 @@
+[Initializing matrix arrays : 1021.73ms]
+[Reference computation (CPU) : 671.775ms]
+deviceArrayA is correct!
+deviceArrayB is correct!
+Running GPU test iteration  1 [Elapsed time : 2.416384ms]
+Running GPU test iteration  2 [Elapsed time : 2.370240ms]
+Running GPU test iteration  3 [Elapsed time : 2.468864ms]
+Running GPU test iteration  4 [Elapsed time : 2.391040ms]
+Running GPU test iteration  5 [Elapsed time : 2.390016ms]
+Running GPU test iteration  6 [Elapsed time : 2.370560ms]
+Running GPU test iteration  7 [Elapsed time : 2.370624ms]
+Running GPU test iteration  8 [Elapsed time : 2.372608ms]
+Running GPU test iteration  9 [Elapsed time : 2.370560ms]
+Running GPU test iteration 10 [Elapsed time : 2.473632ms]
+deviceArrayC is correct!
+[Validation : 411.883ms]
+Discrepancy = 0.0121517
