@@ -5,6 +5,7 @@ CXX      = g++
 CXXSTD   = -std=c++17
 OPT      = -O3
 WARN     = -Wall -w
+OMP      = -fopenmp
 INCLUDES = -I..
 
-CXXFLAGS = $(CXXSTD) $(OPT) $(WARN)
+CXXFLAGS = $(CXXSTD) $(OPT) $(WARN) $(OMP)

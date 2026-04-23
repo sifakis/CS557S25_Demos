@@ -42,5 +42,42 @@ int main()
     outputDomainImage(*grid, "domain.pgm", /*R=*/3.0f);
     std::cout << "\nWrote domain.pgm (x=0 slice of the sphere shell)\n";
 
+    // ------------------------------------------------------------------ //
+    // Parallel walk over leaf nodes                                       //
+    // ------------------------------------------------------------------ //
+    // Recommended iteration pattern for a NanoGrid on the CPU:
+    //
+    //   - Outer loop:  parallel-for over the contiguous array of leaves
+    //                  (grid.tree().getFirstLeaf() + grid.tree().nodeCount(0)).
+    //                  Leaf-level granularity gives enough work per task
+    //                  and keeps each thread writing to disjoint voxels.
+    //   - Inner loop:  beginValueOn() visits only the *active* voxels of
+    //                  the leaf.
+    //   - Accessor:    marked firstprivate so every thread gets its own
+    //                  copy.  Accessors cache their traversal path through
+    //                  the tree and are NOT thread-safe to share.  (This
+    //                  simple count could use *iter directly, but using
+    //                  acc here sets up the pattern we will need in later
+    //                  examples that look up neighbour voxels.)
+    auto*          leaves    = grid->tree().getFirstLeaf();
+    const uint32_t numLeaves = grid->tree().nodeCount(0);
+
+    uint64_t posCount = 0, negCount = 0;
+
+#pragma omp parallel for firstprivate(acc) reduction(+:posCount,negCount)
+    for (uint32_t i = 0; i < numLeaves; ++i) {
+        const auto& leaf = leaves[i];
+        for (auto iter = leaf.beginValueOn(); iter; ++iter) {
+            const float v = acc.getValue(iter.getCoord());
+            if (v >= 0.0f) ++posCount;
+            else           ++negCount;
+        }
+    }
+
+    std::cout << "\nParallel count over active voxels:\n";
+    std::cout << "  values >= 0 : " << posCount << "\n";
+    std::cout << "  values <  0 : " << negCount << "\n";
+    std::cout << "  total       : " << (posCount + negCount) << "\n";
+
     return 0;
 }
