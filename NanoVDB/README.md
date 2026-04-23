@@ -28,3 +28,4 @@ Each example is a self-contained subdirectory with its own
 | Directory     | Introduces                                               |
 |---------------|----------------------------------------------------------|
 | `NanoVDB_0_0` | `build::Grid<float>`, accessor-based voxel insertion, `createNanoGrid()` bake step, read-back via `NanoGrid` accessor |
+| `NanoVDB_0_1` | A genuinely sparse topology (spherical shell in a 512³ ambient domain); leaf-aligned coarse rejection; storing a scalar value per active voxel |
