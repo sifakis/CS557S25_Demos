@@ -38,5 +38,9 @@ int main()
     showVoxel(204,   0,   0);  // just outside the shell       -> inactive
     showVoxel(  0,   0,   0);  // deep in the interior         -> inactive
 
+    // Debug visualisation: the x=0 slice of the domain as an ASCII PGM.
+    outputDomainImage(*grid, "domain.pgm", /*R=*/3.0f);
+    std::cout << "\nWrote domain.pgm (x=0 slice of the sphere shell)\n";
+
     return 0;
 }

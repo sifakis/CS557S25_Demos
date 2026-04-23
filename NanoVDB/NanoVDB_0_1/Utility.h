@@ -49,3 +49,12 @@ void printGridInfo(const nanovdb::NanoGrid<BuildT>& grid, const std::string& lab
 // go on to be tested voxel-by-voxel.
 nanovdb::GridHandle<nanovdb::HostBuffer>
 initializeSphereShell(float D = 200.0f, float R = 3.0f);
+
+// Write an ASCII PGM image of the x = 0 slice of the [-256, 255]^3 domain.
+// Inactive voxels are coloured 0 (black); active voxels have their value
+// linearly mapped from [-R, +R] to [64, 191] and clamped to [0, 255].
+// The image is 512x512 with +y running left-to-right and +z running
+// bottom-to-top (standard mathematical orientation).
+void outputDomainImage(const nanovdb::NanoGrid<float>& grid,
+                       const std::string&              filename = "domain.pgm",
+                       float                           R        = 3.0f);

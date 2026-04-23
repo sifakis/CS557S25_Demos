@@ -2,7 +2,9 @@
 
 #include "nanovdb/tools/GridBuilder.h"
 #include "nanovdb/tools/CreateNanoGrid.h"
+#include <algorithm>
 #include <cmath>
+#include <fstream>
 
 nanovdb::GridHandle<nanovdb::HostBuffer>
 initializeSphereShell(float D, float R)
@@ -52,4 +54,46 @@ initializeSphereShell(float D, float R)
     }
 
     return nanovdb::tools::createNanoGrid(buildGrid);
+}
+
+void outputDomainImage(const nanovdb::NanoGrid<float>& grid,
+                       const std::string&              filename,
+                       float                           R)
+{
+    constexpr int N      = 512;   // 512 voxels along y and z
+    constexpr int offset = 256;   // index space starts at -256
+
+    std::ofstream out(filename);
+    if (!out) {
+        std::cerr << "outputDomainImage: cannot open " << filename << " for writing\n";
+        return;
+    }
+
+    out << "P2\n";
+    out << "# NanoVDB x=0 slice: inactive->0, active values in [-R,+R] -> [64,191]\n";
+    out << N << " " << N << "\n";
+    out << "255\n";
+
+    auto acc = grid.getAccessor();
+
+    for (int row = 0; row < N; ++row) {
+        const int z = (N - 1 - row) - offset;   // top row     -> z = +255
+                                                // bottom row  -> z = -256
+        for (int col = 0; col < N; ++col) {
+            const int y = col - offset;         // leftmost col  -> y = -256
+                                                // rightmost col -> y = +255
+            int pixel = 0;
+            const nanovdb::Coord c(0, y, z);
+            if (acc.isActive(c)) {
+                const float v      = acc.getValue(c);
+                const float scaled = 64.0f + ((v + R) / (2.0f * R)) * 127.0f;
+                pixel = std::clamp(int(scaled + 0.5f), 0, 255);
+            }
+            out << pixel;
+            // PGM spec recommends lines <= 70 chars; break every 16 pixels.
+            if (col == N - 1)              out << '\n';
+            else if ((col % 16) == 15)     out << '\n';
+            else                           out << ' ';
+        }
+    }
 }
