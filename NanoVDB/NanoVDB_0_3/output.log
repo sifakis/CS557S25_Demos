@@ -1,0 +1,14 @@
+=== NanoVDB_0_3  (Laplacian on the sphere shell) ===
+Grid name         : 
+Bounding box      : (-203, -203, -203) -- (203, 203, 203)
+Node counts       : 8 upper, 56 lower, 16259 leaf
+Active voxels     : 3015410
+Sidecar size      : 3015411
+computeLaplacian elapsed : 5.75145 ms
+
+Sample (u, Lu) values (analytical Lu = 2/|p| ~ 0.01 in shell interior):
+  (200, 0, 0) : u=0  Lu=0.0100098  active=yes
+  (199, 0, 0) : u=-1  Lu=0.0100708  active=yes
+  (202, 0, 0) : u=2  Lu=0.0098877  active=yes
+  (203, 0, 0) : u=3  Lu=-16  active=yes
+  (197, 0, 0) : u=-3  Lu=4.01013  active=yes

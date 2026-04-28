@@ -1,0 +1,18 @@
+=== NanoVDB_0_2  (sphere shell, IndexGrid + sidecar) ===
+Grid name         : 
+Bounding box      : (-203, -203, -203) -- (203, 203, 203)
+Node counts       : 8 upper, 56 lower, 16259 leaf
+Active voxels     : 3015410
+Sidecar size      : 3015411  (= 1 + activeVoxelCount)
+
+Sample queries (value via sidecar[acc.getValue(coord)]):
+  (200, 0, 0) : index=2986059  value=0  active=yes
+  (203, 0, 0) : index=2986251  value=3  active=yes
+  (197, 0, 0) : index=2971664  value=-3  active=yes
+  (204, 0, 0) : index=0  value=0  active=no
+  (0, 0, 0) : index=0  value=0  active=no
+
+Parallel count over active voxels (reading through sidecar):
+  values >= 0 : 1531384
+  values <  0 : 1484026
+  total       : 3015410

@@ -1,0 +1,19 @@
+=== NanoVDB_0_1  (sphere shell: D=200, R=3) ===
+Grid name         : 
+Bounding box      : (-203, -203, -203) -- (203, 203, 203)
+Node counts       : 8 upper, 56 lower, 16259 leaf
+Active voxels     : 3015410
+
+Sample queries:
+  (200, 0, 0) : value=0  active=yes
+  (203, 0, 0) : value=3  active=yes
+  (197, 0, 0) : value=-3  active=yes
+  (204, 0, 0) : value=0  active=no
+  (0, 0, 0) : value=0  active=no
+
+Wrote domain.pgm (x=0 slice of the sphere shell)
+
+Parallel count over active voxels:
+  values >= 0 : 1531384
+  values <  0 : 1484026
+  total       : 3015410

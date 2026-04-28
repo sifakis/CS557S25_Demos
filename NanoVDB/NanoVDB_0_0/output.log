@@ -1,0 +1,14 @@
+=== NanoVDB_0_0 ===
+Grid name         : 
+Bounding box      : (0, 0, 0) -- (100, 200, 300)
+Node counts       : 1 upper, 2 lower, 2 leaf
+Active voxels     : 4
+
+Value at (  0,  0,  0) : 1
+Value at (  1,  0,  0) : 2
+Value at (  0,  1,  0) : 3
+Value at (100,200,300) : 42
+Value at (  5,  5,  5) : 0  <- background (inactive)
+
+Is (0,0,0) active? yes
+Is (5,5,5) active? no
