@@ -1,3 +1,6 @@
 NanoVDB_*/NanoVDB_*
 NanoVDB_*/*.o
 NanoVDB_*/*.pgm
+
+# Keep the reference debug-visualisation that ships with NanoVDB_0_1.
+!NanoVDB_0_1/domain.pgm
