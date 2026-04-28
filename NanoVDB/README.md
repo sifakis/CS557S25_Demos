@@ -30,3 +30,4 @@ Each example is a self-contained subdirectory with its own
 | `NanoVDB_0_0` | `build::Grid<float>`, accessor-based voxel insertion, `createNanoGrid()` bake step, read-back via `NanoGrid` accessor |
 | `NanoVDB_0_1` | A genuinely sparse topology (spherical shell in a 512³ ambient domain); leaf-aligned coarse rejection; storing a scalar value per active voxel |
 | `NanoVDB_0_2` | Same topology as `0_1`, separated into a `NanoGrid<ValueOnIndex>` plus a parallel `std::vector<float>` sidecar; topology-only `build::Grid<ValueMask>` build, leaf-level sparse indexing, sidecar fill in parallel |
+| `NanoVDB_0_3` | Discrete 7-point Laplacian over the IndexGrid sphere shell (`u` → `Lu`, both sidecars); inactive neighbours read through index 0 → `u[0] = 0`, so the stencil needs no explicit boundary tests |
